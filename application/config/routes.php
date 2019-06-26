@@ -149,12 +149,27 @@ $route['admin/risalah/simpanbab'] = 'risalah/simpanbab';
 
 $route['admin/verifikasi'] = 'verifikasi/admin';
 
+$route['admin/tahun'] = 'tahun/index';
+$route['admin/tahun/changetahun/(:any)/(:any)'] = 'tahun/changetahun/$1/$2';
+$route['admin/tahun/add'] = 'tahun/add';
+$route['admin/tahun/edit/(:any)'] = 'tahun/edit/$1';
+$route['admin/tahun/hapus/(:any)'] = 'tahun/delete/$1';
+$route['admin/tahun/simpan'] = 'tahun/save';
+$route['admin/tahun/update/(:any)'] = 'tahun/update/$1';
+
 $route['admin/juri'] = 'juri/index';
 $route['admin/juri/add'] = 'juri/add';
 $route['admin/juri/edit/(:any)'] = 'juri/edit/$1';
 $route['admin/juri/hapus/(:any)'] = 'juri/delete/$1';
 $route['admin/juri/simpan'] = 'juri/save';
 $route['admin/juri/update/(:any)'] = 'juri/update/$1';
+
+$route['admin/pengguna'] = 'pengguna/index';
+$route['admin/pengguna/add'] = 'pengguna/add';
+$route['admin/pengguna/edit/(:any)'] = 'pengguna/edit/$1';
+$route['admin/pengguna/hapus/(:any)'] = 'pengguna/delete/$1';
+$route['admin/pengguna/simpan'] = 'pengguna/save';
+$route['admin/pengguna/update/(:any)'] = 'pengguna/update/$1';
 
 $route['admin/juri/pembagiantim/(:any)'] = 'pembagiantim/index/$1';
 $route['admin/juri/pembagiantim/add/(:any)'] = 'pembagiantim/add/$1';
@@ -190,6 +205,11 @@ $route['pimpinan/verifikasi'] = 'verifikasi/pimpinanlist';
 $route['pimpinan/verifikasi/(:any)'] = 'verifikasi/pimpinan/$1';
 $route['pimpinan/risalah/simpanbab/(:any)'] = 'verifikasi/simpanbab/$1';
 $route['pimpinan/risalah/simpanbab/(:any)/(:any)'] = 'verifikasi/simpanbab/$1/$2';
+
+$route['pimpinan/verifikasi/risalah/edit/(:any)/(:any)'] = 'risalah/edit3/$1/$2';
+$route['pimpinan/verifikasi/risalah/edit/(:any)/(:any)/(:any)'] = 'risalah/edit3/$1/$2/$3';
+$route['pimpinan/verifikasi/risalah/simpan/(:any)/(:any)'] = 'risalah/simpan3/$1/$2';
+$route['pimpinan/verifikasi/risalah/simpan/(:any)/(:any)/(:any)'] = 'risalah/simpan3/$1/$2/$3';
 
 
 $route['juri/penilaian'] = 'penilaian/index';

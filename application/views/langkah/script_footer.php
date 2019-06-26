@@ -21,7 +21,9 @@ function loadtable() {
                 'width': '100px'
             },
             null,
-            null,
+            null,{
+                'width': '150px'
+            },
         ],
         'bDestroy': true,
         'processing': true, //Feature control the processing indicator.\

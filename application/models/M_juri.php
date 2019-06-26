@@ -18,6 +18,7 @@ class M_juri extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('user u','u.u_id=rk.id_user','inner');
+        $this->db->where('rk.id_tahun',$this->thn_aktif);
     
         $i = 0;
         foreach ($this->column_search as $item) // loop column
@@ -70,9 +71,12 @@ class M_juri extends CI_Model
     public function count_all($param='')
     {
         $this->db->from($this->table);
+        $this->db->join('user u','u.u_id=rk.id_user','inner');
+        $this->db->where('rk.id_tahun',$this->thn_aktif);
         return $this->db->count_all_results();
     }
     public function all(){
+        $this->db->where('id_tahun',$this->thn_aktif);
         return $this->db->order_by('j_id','asc')->get('juri');
     }
     public function by_user($id)
@@ -139,6 +143,7 @@ class M_juri extends CI_Model
             }
             $juri['j_juri'] = $this->input->post('nama',TRUE);
             $juri['id_user'] = $id_user;
+            $juri['id_tahun'] = $this->thn_aktif;
             $this->db->insert('juri',$juri);
         if ($this->db->trans_status()===FALSE){
             $this->db->trans_rollback();

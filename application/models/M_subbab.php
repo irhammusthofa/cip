@@ -18,6 +18,8 @@ class M_subbab extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('langkah br','br.ln_id=rk.id_langkah','inner');
+        $this->db->join('bab_risalah b','b.br_kode=br.id_bab','inner');
+        $this->db->where('b.id_tahun',$this->thn_aktif);
     
         $i = 0;
         foreach ($this->column_search as $item) // loop column
@@ -71,6 +73,8 @@ class M_subbab extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('langkah br','br.ln_id=rk.id_langkah','inner');
+        $this->db->join('bab_risalah b','b.br_kode=br.id_bab','inner');
+        $this->db->where('b.id_tahun',$this->thn_aktif);
         return $this->db->count_all_results();
     }
     public function by_bab($id){

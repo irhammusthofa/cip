@@ -18,6 +18,7 @@ class M_kriteria extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('jenis_cip jc','jc.jc_id=rk.id_jenis_cip','inner');
+        $this->db->where('rk.id_tahun',$this->thn_aktif);
     
         $i = 0;
         foreach ($this->column_search as $item) // loop column
@@ -71,9 +72,11 @@ class M_kriteria extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('jenis_cip jc','jc.jc_id=rk.id_jenis_cip','inner');
+        $this->db->where('rk.id_tahun',$this->thn_aktif);
         return $this->db->count_all_results();
     }
     public function all(){
+        $this->db->where('id_tahun',$this->thn_aktif);
         return $this->db->order_by('kp_id','asc')->get('kriteria');
     }
 

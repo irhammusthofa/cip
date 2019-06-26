@@ -8,7 +8,7 @@ $(document).ready(function() {
 
 function loadtable(id_bab) {
     //datatables
-    if (id_bab=="") return;
+    //if (id_bab=="") return;
     table = $('#dtable').DataTable({
         'paging': true,
         'lengthChange': true,

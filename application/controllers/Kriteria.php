@@ -64,6 +64,7 @@ class Kriteria extends User_Controller
 		$data['kp_kriteria'] = $this->input->post('nama',TRUE);
 		$data['id_jenis_cip'] = $this->input->post('jenis',TRUE);
 		$data['kp_nilai_kriteria'] = $this->input->post('bobot',TRUE);
+		$data['id_tahun'] = $this->thn_aktif;
 
 		$save = $this->m_kriteria->insert($data);
 		if ($save){

@@ -28,6 +28,7 @@ class M_penilaian extends CI_Model
             $this->db->where('j.id_user', $this->user->u_id);    
         }
         
+        $this->db->where('c.id_tahun', $this->thn_aktif);
     
         $i = 0;
         foreach ($this->column_search as $item) // loop column
@@ -88,9 +89,11 @@ class M_penilaian extends CI_Model
         }else{
             $this->db->where('j.id_user', $this->user->u_id);    
         }
+        $this->db->where('c.id_tahun', $this->thn_aktif);
         return $this->db->count_all_results();
     }
     public function all(){
+        $this->db->where('id_tahun', $this->thn_aktif);
         return $this->db->order_by('j_id','asc')->get('juri');
     }
     public function by_id($id){

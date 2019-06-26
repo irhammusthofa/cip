@@ -29,6 +29,7 @@
                         <th>Kode</th>
                         <th>Langkah</th>
                         <th>Nama BAB</th>
+                        <th>Verifikasi Pimpinan</th>
                     </tr>
                 </thead>
             </table>

@@ -40,6 +40,14 @@
                                 <?= form_dropdown('kode_bab',$data['bab'],@$data['langkah']->id_bab,array('id'=>'kode_bab','class'=>'form-control','required'=>'true')) ?>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-6 control-label">Verifikasi Pimpinan <b style="color:red">*</b></label>
+                            <div class="col-sm-6">
+                                <?php $arr_ver_pimpinan = ['0'=>'Tidak','1'=>'Ya']; ?>
+                                <?= form_dropdown('ver_pimpinan',$arr_ver_pimpinan,@$data['langkah']->ln_ver_pimpinan,array('id'=>'ver_pimpinan','class'=>'form-control','required'=>'true')) ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- /.box-body -->

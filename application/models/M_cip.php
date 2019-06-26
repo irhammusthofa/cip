@@ -18,6 +18,7 @@ class M_cip extends CI_Model
     private function _get_datatables_query($param='')
     {
         $this->db->from($this->table);
+        $this->db->where('id_tahun',$this->thn_aktif);
         if ($this->user->u_role=='user'){
             $this->db->where('id_user',$this->user->u_id);
         }
@@ -74,22 +75,27 @@ class M_cip extends CI_Model
     public function count_all($param='')
     {
         $this->db->from($this->table);
+        $this->db->where('id_tahun',$this->thn_aktif);
         if ($this->user->u_role=='user'){
             $this->db->where('id_user',$this->user->u_id);
         }
         return $this->db->count_all_results();
     }
     public function all(){
-        return $this->db->from('cip c')->get();
+        return $this->db->from('cip c')
+            ->where('id_tahun',$this->thn_aktif)
+            ->get();
     }
     public function by_id($id){
         return $this->db->from('cip c')
             ->join('user u','u.u_id=c.id_user','inner')
+            ->where('id_tahun',$this->thn_aktif)
             ->where('c.t_no_gugus',$id)->get();
     }
     public function by_jenis($id){
         return $this->db->from('cip c')
             ->join('user u','u.u_id=c.id_user','inner')
+            ->where('id_tahun',$this->thn_aktif)
             ->where('c.id_jenis',$id)->get();
     }
     public function signup(){
@@ -132,7 +138,7 @@ class M_cip extends CI_Model
                 $team['id_fungsi']              = $this->input->post('fungsi',TRUE);
                 $team['id_user']                = $last_id;
                 $team['id_temp']                = $temp_id['temp'];
-
+                $team['id_tahun']               = $this->thn_aktif;
                 $this->db->insert('cip',$team);
 				$arr = array(
 					'status' => TRUE,

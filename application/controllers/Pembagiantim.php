@@ -9,9 +9,18 @@ class Pembagiantim extends User_Controller
 		parent::__construct();
 		$this->auth();
 		$this->load->model('m_juri');
+		$this->load->model('m_bab');
 		$this->load->model('m_cip');
 		$this->load->model('m_juri_tim');
+		$this->load->model('m_risalah');
 
+	}
+
+	private function setCurrentStep($val){
+		return $this->session->set_userdata('currentStep',$val);
+	}
+	private function getCurrentStep(){
+		return $this->session->userdata('currentStep');
 	}
 	public function index($juri)
 	{
@@ -43,7 +52,9 @@ class Pembagiantim extends User_Controller
 		$tim = $this->m_cip->tim_belum_dipilih($juri)->result();
 		$data['tim'][''] = 'Pilih Tim';
 		foreach ($tim as $item) {
-			$data['tim'][$item->t_no_gugus] = $item->t_nama_gugus;
+			if ($this->check_status($item->t_no_gugus)==3){
+				$data['tim'][$item->t_no_gugus] = $item->t_nama_gugus;	
+			}
 		}
 		$param = array(
 			'data' => $data,
@@ -64,7 +75,10 @@ class Pembagiantim extends User_Controller
 		$data['tim'][''] = 'Pilih Tim';
 		$data['tim'][$data['pembagiantim']->id_tim] = $data['pembagiantim']->t_nama_gugus;
 		foreach ($tim as $item) {
-			$data['tim'][$item->t_no_gugus] = $item->t_nama_gugus;
+			if ($this->check_status($item->t_no_gugus)==3){
+				$data['tim'][$item->t_no_gugus] = $item->t_nama_gugus;	
+			}
+			
 		}
 		$param = array(
 			'data'	=> $data,
@@ -109,6 +123,77 @@ class Pembagiantim extends User_Controller
 		}
 
 	}
+	private function check_status($id_cip){
+    	$id_cip = $id_cip;
+    	$data['bab_risalah'] = $this->m_bab->all()->result();
+		$data['stepStatus']  = '';
+		$data['stepStatusDesc']  = '';
+		$data['currentStepDesc'] = '';
+		$data['urllangkah'] = "";
+
+		$this->setCurrentStep('');
+		foreach ($data['bab_risalah'] as $item) {
+			$param['id_cip'] 	 = $id_cip;
+			$param['id_bab'] 	 = $item->br_kode;
+			if ($item->br_jenis==1){
+				$q = $this->m_risalah->check_status_by_bab($param);
+			}else{
+				$q = $this->m_risalah->check_status_by_bab2($param);
+			}
+			
+			if (empty($this->getCurrentStep())){
+
+				$data['stepStatus'][$item->br_kode] = $q;
+				
+				if ($q==-1 || $q==0){
+					$this->setCurrentStep($item->br_kode);
+					$data['currentStepDesc'] = $item->br_bab;
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'sedang diisi']);
+				}else if ($q==1){
+					$this->setCurrentStep($item->br_kode);
+					$data['currentStepDesc'] = $item->br_bab;
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'menunggu verifikasi pimpinan']);
+				}else if ($q==2){
+					$this->setCurrentStep($item->br_kode);
+					$data['currentStepDesc'] = $item->br_bab;
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'revisi']);
+				}else if ($q==4){
+					$this->setCurrentStep($item->br_kode);
+					$data['currentStepDesc'] = $item->br_bab;
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'menunggu verifikasi admin']);
+				}else{
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'success','text'=>'selesai']);
+				}
+			}else{
+				$data['stepStatus'][$item->br_kode] = $q;
+				if($q==0 || $q==-1){
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'default','text'=>'belum diisi']);
+				}else if($q==1){
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'menunggu verifikasi pimpinan']);
+				}else if($q==2){
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'revisi']);
+				}else if($q==3){
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'success','text'=>'selesai']);
+				}else if($q==4){
+					$data['stepStatusDesc'][$item->br_kode] = label_skin(['type'=>'warning','text'=>'menunggu verifikasi admin']);
+				}
+			}
+			
+			
+		}
+		$data['currentStep'] = $this->getCurrentStep();
+		$status = "";
+		foreach ($data['bab_risalah'] as $item) {
+            if ($data['stepStatus'][$item->br_kode]==3){
+                $status = 3;
+            }else if ($data['stepStatus'][$item->br_kode]>0 || $data['currentStep'] == $item->br_kode){
+            	$status = $data['stepStatus'][$item->br_kode];
+            }else{
+
+            }
+        }
+        return $status;
+    }
 	public function ajax_list()
 	{
 

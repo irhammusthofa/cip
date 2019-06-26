@@ -11,6 +11,8 @@
 <section class="content">
     <!-- Default box -->
     <?= fs_show_alert() ?>
+    <button class="btn btn-primary" onclick="preview('<?= base64_encode($data['id_cip']) ?>')"><i class="fa fa-eye"></i> Lihat Risalah</button>
+    <br><br>
     <div class="box">
         <div class="box-header with-border">
 

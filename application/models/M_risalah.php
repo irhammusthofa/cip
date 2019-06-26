@@ -23,6 +23,9 @@ class M_risalah extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('langkah ln','ln.ln_id=sb.id_langkah','inner');
+        if (empty($param['id_bab'])){
+            $param['id_bab'] = 'notfound';
+        }
         $this->db->join('bab_risalah br','br.br_kode=ln.id_bab and br.br_kode="'.$param['id_bab'].'"','inner');
         $this->db->join('risalah_editor c','c.id_kode=sb.sb_id and c.id_cip="'.$param['id_cip'].'"','left');
         
@@ -100,26 +103,42 @@ class M_risalah extends CI_Model
     }
     function get_datatables($param='')
     {
+
         $bab = $this->m_bab->by_id($param['id_bab'])->row();
-        if ($bab->br_jenis==1){
-            $this->_get_datatables_query($param);
+        if (!empty($bab)){
+            if ($bab->br_jenis==1){
+                $this->_get_datatables_query($param);
+            }else{
+                $this->_get_datatables_query2($param);
+            }
+            if($_POST['length'] != -1)
+            $this->db->limit($_POST['length'], $_POST['start']);
+            $query = $this->db->get();
+            return $query->result();
         }else{
-            $this->_get_datatables_query2($param);
+            
+            $this->_get_datatables_query($param);
+            if($_POST['length'] != -1)
+            $this->db->limit($_POST['length'], $_POST['start']);
+            $query = $this->db->get();
+            return $query->result();
         }
         
-        if($_POST['length'] != -1)
-        $this->db->limit($_POST['length'], $_POST['start']);
-        $query = $this->db->get();
-        return $query->result();
+        
+        
     }
 
     function count_filtered($param='')
     {
         $bab = $this->m_bab->by_id($param['id_bab'])->row();
-        if ($bab->br_jenis==1){
-            $this->_get_datatables_query($param);
+        if (!empty($bab)){
+            if ($bab->br_jenis==1){
+                $this->_get_datatables_query($param);
+            }else{
+                $this->_get_datatables_query2($param);
+            }
         }else{
-            $this->_get_datatables_query2($param);
+            $this->_get_datatables_query($param);
         }
 
         $query = $this->db->get();
@@ -129,17 +148,25 @@ class M_risalah extends CI_Model
     public function count_all($param='')
     {
         $bab = $this->m_bab->by_id($param['id_bab'])->row();
-        if ($bab->br_jenis==1){
+        if (!empty($bab)){
+            if ($bab->br_jenis==1){
+                $this->db->from($this->table);
+                $this->db->join('langkah ln','ln.ln_id=sb.id_langkah','inner');
+                $this->db->join('bab_risalah br','br.br_kode=ln.id_bab and br.br_kode="'.$param['id_bab'].'"','inner');
+                $this->db->join('risalah_editor c','c.id_kode=sb.sb_id and c.id_cip="'.$param['id_cip'].'"','left');
+                
+            }else{
+                $this->db->from($this->table2);
+                $this->db->join('bab_risalah br','br.br_kode=sb.id_bab and br.br_kode="'.$param['id_bab'].'"','inner');
+                $this->db->join('risalah_editor_2 c','c.id_kode=sb.ln_id and c.id_cip="'.$param['id_cip'].'"','left');
+                
+            }
+        }else{
+            $param['id_bab'] = 'notfound';
             $this->db->from($this->table);
             $this->db->join('langkah ln','ln.ln_id=sb.id_langkah','inner');
             $this->db->join('bab_risalah br','br.br_kode=ln.id_bab and br.br_kode="'.$param['id_bab'].'"','inner');
             $this->db->join('risalah_editor c','c.id_kode=sb.sb_id and c.id_cip="'.$param['id_cip'].'"','left');
-            
-        }else{
-            $this->db->from($this->table2);
-            $this->db->join('bab_risalah br','br.br_kode=sb.id_bab and br.br_kode="'.$param['id_bab'].'"','inner');
-            $this->db->join('risalah_editor_2 c','c.id_kode=sb.ln_id and c.id_cip="'.$param['id_cip'].'"','left');
-            
         }
         
         return $this->db->count_all_results();

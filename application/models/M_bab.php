@@ -17,6 +17,7 @@ class M_bab extends CI_Model
     private function _get_datatables_query($param='')
     {
         $this->db->from($this->table);
+        $this->db->where('id_tahun',$this->thn_aktif);
     
         $i = 0;
         foreach ($this->column_search as $item) // loop column
@@ -69,12 +70,16 @@ class M_bab extends CI_Model
     public function count_all($param='')
     {
         $this->db->from($this->table);
+        $this->db->where('id_tahun',$this->thn_aktif);
         return $this->db->count_all_results();
     }
     public function all(){
+
+        $this->db->where('id_tahun',$this->thn_aktif);
         return $this->db->order_by('br_position','asc')->get('bab_risalah');
     }
     public function by_id($id){
+        $this->db->where('id_tahun',$this->thn_aktif);
         return $this->db->where('br_kode',$id)->get('bab_risalah');
     }
     public function update($id,$data){

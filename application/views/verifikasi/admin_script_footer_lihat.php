@@ -8,7 +8,7 @@ $(document).ready(function() {
 
 function loadtable(id_bab) {
     //datatables
-    if (id_bab=="") return;
+    //if (id_bab=="") return;
     table = $('#dtable').DataTable({
         'paging': true,
         'lengthChange': true,
@@ -56,7 +56,7 @@ function hapusRisalah(param) {
     $('#btnHapus').attr('href', '/risalah/hapus/' + id);
     $('#modal-hapus-risalah').modal();
 }
-function preview(id_bab) {
+function preview(id_bab,id_cip) {
     $('#modal-lihat-risalah').modal();
     $('#div-loading').show();
     $.ajax({
@@ -64,7 +64,8 @@ function preview(id_bab) {
         type: "post",
         dataType:"json",
         data: {
-            id_bab: id_bab
+            id_bab: id_bab,
+            id_cip: id_cip
         },
         success: function(response) {
             $('#div-loading').hide();

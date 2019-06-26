@@ -297,6 +297,42 @@ class Risalah extends User_Controller
 		);
 		$this->template($param);
     }
+    public function edit3($kode,$id_cip,$langkah=false)
+	{
+        $kode = base64_decode($kode);
+        $id_cip = base64_decode($id_cip);
+
+		$this->title 	= "Edit Risalah";
+		$this->content 	= "risalah/edit3";
+		$this->assets 	= array('assets_form');
+		$data['urllangkah'] = "";
+		if ($langkah){
+			$data['rkode']      = $this->m_risalah->rkode_by_kode2($kode)->row();
+			$data['reditor']    = $this->m_risalah->reditor_by_kode_cip2($kode,$id_cip)->row();
+			$data['kode']       = $kode;
+			$data['id_cip']     = $id_cip;
+			if (!empty($data['reditor'])){
+				$data['val'] = $data['reditor']->r_value;
+			}
+			$data['rkode']->sb_sub_bab = $data['rkode']->ln_langkah;
+			$data['urllangkah'] = "/true";
+		}else{
+			$data['rkode']      = $this->m_risalah->rkode_by_kode($kode)->row();
+			$data['reditor']    = $this->m_risalah->reditor_by_kode_cip($kode,$id_cip)->row();
+			$data['kode']       = $kode;
+			$data['id_cip']     = $id_cip;
+			if (empty($data['reditor'])){
+				$data['val'] =  @$data['rkode']->sb_template;
+			}else{
+				$data['val'] = $data['reditor']->r_value;
+			}
+		}
+        
+		$param = array(
+            'data' => $data,
+		);
+		$this->template($param);
+    }
 	public function edit($kode,$id_cip,$langkah=false)
 	{
         $kode = base64_decode($kode);
@@ -401,9 +437,43 @@ class Risalah extends User_Controller
 		}
         
 	}
+	public function simpan3($kode,$id_cip,$langkah=false){
+        $kode = base64_decode($kode);
+        $id_cip = base64_decode($id_cip);
+		if ($langkah){
+			$data['id_kode'] = $kode;
+			$data['id_cip'] = $id_cip;
+			$data['r_value'] = $this->input->post('editor1');
+		
+
+			$q = $this->m_risalah->simpan2($data);
+			if ($q){
+				fs_create_alert(['type' => 'success', 'message' => 'Data berhasil disimpan.']);
+			}else{
+				fs_create_alert(['type' => 'danger', 'message' => 'Data gagal disimpan.']);
+			}
+				redirect('pimpinan/verifikasi/risalah/edit/'.base64_encode($kode).'/'.base64_encode($id_cip)."/true");
+			
+		}else{
+			$data['id_kode'] = $kode;
+			$data['id_cip'] = $id_cip;
+			$data['r_value'] = $this->input->post('editor1');
+		
+
+			$q = $this->m_risalah->simpan($data);
+			if ($q){
+				fs_create_alert(['type' => 'success', 'message' => 'Data berhasil disimpan.']);
+			}else{
+				fs_create_alert(['type' => 'danger', 'message' => 'Data gagal disimpan.']);
+			}
+				redirect('pimpinan/verifikasi/risalah/edit/'.base64_encode($kode).'/'.base64_encode($id_cip));
+			
+		}
+        
+	}
 	public function simpanbab($langkah=false){
 		$data['id_cip'] 	= $this->user->u_name;
-		$data['r_status'] 	= 1;
+		$data['r_status'] 	= 4;
 
 		$param['id_cip'] 	 = $data['id_cip'];
 		$param['id_bab'] 	 = $this->getCurrentStep();
@@ -413,6 +483,9 @@ class Risalah extends User_Controller
 			if (count($mlangkah)>0){
 				foreach ($mlangkah as $row) {
 					$param['id_kode'][] = $row->ln_id;
+					if ($row->ln_ver_pimpinan == 1){
+						$data['r_status'] 	= 1;
+					}
 				}
 			}
 			$q = $this->m_risalah->check_nilai_by_bab2($param);
@@ -432,6 +505,9 @@ class Risalah extends User_Controller
 			if (count($mlangkah)>0){
 				foreach ($mlangkah as $row) {
 					$param['id_kode'][] = $row->sb_id;
+					if ($row->ln_ver_pimpinan == 1){
+						$data['r_status'] 	= 1;
+					}
 				}
 			}
 			$q = $this->m_risalah->check_nilai_by_bab($param);
@@ -464,7 +540,12 @@ class Risalah extends User_Controller
 	}
 	public function preview(){
 		$param['id_bab'] 	= $this->input->post('id_bab',TRUE);
-		$param['id_cip']	= $this->user->u_name;
+		if (empty($this->input->post('id_cip',TRUE))){
+			$param['id_cip']	= $this->user->u_name;
+		}else{
+			$param['id_cip']	= $this->input->post('id_cip',TRUE);
+			$param['id_cip'] 	= base64_decode($param['id_cip']);
+		}
 		$data_bab = $this->m_bab->by_id($param['id_bab'])->row();
 		if($data_bab->br_jenis==0){
 			$risalah 		= $this->m_risalah->reditor_bab_by_cip_2($param)->result();
@@ -533,7 +614,6 @@ class Risalah extends User_Controller
 		$data = array();
 
 		$no = $_POST['start'];
-
 		foreach ($list as $item) {
 			if ($bab->br_jenis<1){
 				$item->sb_id = $item->ln_id;

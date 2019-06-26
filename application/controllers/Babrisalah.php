@@ -53,6 +53,7 @@ class Babrisalah extends User_Controller
         $data['br_position']	= $this->input->post('position',TRUE);
         $data['br_bab'] 	= $this->input->post('nama',TRUE);
         $data['br_jenis'] 	= $this->input->post('jenis_bab',TRUE);
+        $data['id_tahun'] 	= $this->thn_aktif;
 
         $q = $this->m_bab->insert($data);
         if ($q){

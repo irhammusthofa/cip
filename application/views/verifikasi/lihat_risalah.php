@@ -38,7 +38,7 @@
                                 
                                 
                             if ($data['stepStatus'][$item->br_kode]==3){
-                                $btnpreview = '<li><a href="#" onclick="preview(\''.$item->br_kode.'\')" data-toggle="modal"><i class="fa fa-eye"></i> Preview</a></li>';
+                                $btnpreview = '<li><a href="#" onclick="preview(\''.$item->br_kode.'\',\''.base64_encode($data['id_cip']).'\')" data-toggle="modal"><i class="fa fa-eye"></i> Preview</a></li>';
                                 
                                 $btn = '<div class="input-group">
                                     <button type="button" class="btn btn-xs btn-default pull-right dropdown-toggle" data-toggle="dropdown">
@@ -54,6 +54,7 @@
                                     </ul>
                                 </div>';
                             }else if ($data['stepStatus'][$item->br_kode]>0 || $data['currentStep'] == $item->br_kode){
+                                $btnpreview = '<li><a href="#" onclick="preview(\''.$item->br_kode.'\',\''.base64_encode($data['id_cip']).'\')" data-toggle="modal"><i class="fa fa-eye"></i> Preview</a></li>';
                                 $btn = '<div class="input-group">
                                 <button type="button" class="btn btn-xs btn-default pull-right dropdown-toggle" data-toggle="dropdown">
                                     <span> Action
@@ -64,6 +65,7 @@
                                     <li><a href="#" onclick="showSubItem(\''.$item->br_kode.'\')"><i class="fa fa-edit"></i> Edit</a></li>
                                     <li>'. anchor("admin/verifikasi/approve/".base64_encode($item->br_kode)."/".base64_encode($data["id_cip"]),"<i class=\"fa fa-check\"></i> Approve</a>").'</li>
                                     <li><a href="#" onclick="showTolak(\''.base64_encode($item->br_kode).'\',\''.base64_encode($data["id_cip"]).'\')"><i class="fa fa-close"></i> Tolak</a></li>
+                                        '.$btnpreview.'
                                 </ul>
                             </div>';
                             }else{

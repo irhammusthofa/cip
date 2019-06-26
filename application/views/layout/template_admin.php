@@ -55,10 +55,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-
+      <?php if($this->user->u_role == 'admin'){ ?>
+      <div class="col-md-2" style="margin-top:10px">
+        <?= form_dropdown('thn',$this->session->userdata('tahun'),$this->session->userdata('tahun_aktif'),array('class'=>'form-control','onchange'=>'changetahun(this,\''.base64_encode(current_url()).'\')')) ?>
+      </div>
+      <?php } ?>
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">      
           <!-- User Account: style can be found in dropdown.less -->
+          
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <img src="<?= base_url('assets/img/blank_profile.png') ?>" class="user-image" alt="User Image">
@@ -149,6 +154,9 @@
   $(document).ready(function () {
     $('.sidebar-menu').tree()
   })
+  function changetahun(tahun,redirect){
+    window.location.href = '/admin/tahun/changetahun/'+tahun.value+'/'+redirect;
+  }
 </script>
 <?= fs_assets_footer() ?>
 

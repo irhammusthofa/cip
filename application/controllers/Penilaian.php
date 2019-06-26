@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-
+use Sunra\PhpSimple\HtmlDomParser;
 class Penilaian extends User_Controller
 {
 
@@ -13,6 +13,8 @@ class Penilaian extends User_Controller
 		$this->load->model('m_juri');
 		$this->load->model('m_kriteria');
 		$this->load->model('m_jenis');
+		$this->load->model('m_bab');
+		$this->load->model('m_risalah');
 
 	}
 
@@ -49,7 +51,7 @@ class Penilaian extends User_Controller
 		$idcip = base64_decode($idcip);
 		$this->title 	= "Data Penilaian";
 		$this->content 	= "penilaian/list_kriteria";
-		$this->assets 	= array();
+		$this->assets 	= array('assets_nilai');
 		$juri = $this->m_juri->by_user($this->user->u_id)->row();
 		$tim 			= $this->m_cip->by_id($idcip)->row();
 		$data['id_cip'] = $idcip;
@@ -59,7 +61,7 @@ class Penilaian extends User_Controller
 			
 		);
 		$this->template($param);
-
+		$this->load_view('lihat_risalah');
 	}
 
 	public function lihat($id_cip)
@@ -92,6 +94,103 @@ class Penilaian extends User_Controller
 		);
 		$this->template($param);
 
+	}
+	public function send_nilai($id_cip){
+		$id_cip = base64_decode($id_cip);
+		if ($this->getnilai($id_cip)){
+			fs_create_alert(['type' => 'success', 'message' => 'Email hasil penilaian berhasil dikirim.']);	
+		}else{
+			fs_create_alert(['type' => 'danger', 'message' => 'Email hasil penilaian gagal dikirim.']);	
+		}
+		redirect('admin/penilaian/');
+	}
+	private function getnilai($id_cip)
+	{
+		$tim 			= $this->m_cip->by_id($id_cip)->row();
+		$kriteria 		= $this->m_kriteria->by_jenis($tim->id_jenis)->result();
+		$tmp_kriteria 	= [];
+		foreach ($kriteria as $item) {
+			$tmp_kriteria[] = $item->kp_id;
+		}
+		$kriteria = $tmp_kriteria;
+		$data['tim'] = $this->m_cip->by_jenis($tim->id_jenis)->result();
+		$alternatif 	= [];
+		foreach ($data['tim'] as $item) {
+			$alternatif[] = $item->t_no_gugus;
+		}
+		$data['kriteria-reference'] = $this->m_penilaian->kriteria_reference($kriteria,$alternatif);
+		$data['ternormalisasi'] 	= $this->m_penilaian->ternormalisasi($kriteria,$alternatif,$data['kriteria-reference']);
+		$data['ideal'] 				= $this->m_penilaian->ideal($kriteria,$data['kriteria-reference'],$data['ternormalisasi']);
+
+		$data['kriteria']			= $kriteria;
+		$data['alternatif']			= $alternatif;
+		$param = array(
+			'data'=>$data,
+		);
+		$html = $this->load->view('penilaian/email_nilai',$param,TRUE);
+		return $this->sendemailnilai(['email'=>$tim->u_email,'html'=>$html]);
+
+	}
+	private function sendemailnilai($data){
+		$this->load->library('email');
+
+		$this->email->from('Wahyumarutiadjie09@gmail.com', 'Hasil Penilaian');
+		$this->email->to($data['email']);
+		$this->email->set_mailtype("html");
+
+		$this->email->subject('Signup');
+		$this->email->message($data['html']);
+
+		return $this->email->send();
+	}
+	public function preview(){
+		$param['id_cip'] 	= $this->input->post('id_cip',TRUE);
+		$param['id_cip'] 	= base64_decode($param['id_cip']);
+		
+		$bab = $this->m_bab->all()->result();
+		$data['val'] 	= '';
+		foreach ($bab as $data_bab) {
+			$param['id_bab'] = $data_bab->br_kode;
+			if($data_bab->br_jenis==0){
+				$risalah 		= $this->m_risalah->reditor_bab_by_cip_2($param)->result();
+			}else{
+				$risalah 		= $this->m_risalah->reditor_bab_by_cip($param)->result();
+			}
+			
+			$bab_risalah 	= '';
+			$langkah 		= '';
+			$sub_bab 		= '';
+			if (count($risalah)>0){
+				foreach ($risalah as $row) {
+					if (!empty($row->r_value)){
+						$dom = HtmlDomParser::str_get_html( $row->r_value );
+						$elems = $dom->find('body',0)->innertext();
+						if ($bab_risalah != $row->br_kode){
+							$bab_risalah = $row->br_kode;
+							$data['val'] .= '<h3>'.$row->br_bab.'</h3>';
+						}
+						if ($langkah != $row->ln_id){
+							$langkah = $row->ln_id;
+							$data['val'] .= '<h4>'.$row->ln_langkah.'</h4>';
+						}
+						if($data_bab->br_jenis==1){
+							if ($sub_bab != $row->sb_id){
+								$sub_bab = $row->sb_id;
+								$data['val'] .= '<h5>'.$row->sb_sub_bab.'</h5>';
+							}
+						}
+						
+						$data['val'] .= $elems;
+					}
+				}
+			}
+		}
+		
+		echo json_encode(array(
+			'status'=>TRUE,
+			'count'=>count($risalah),
+			'data'=>$data['val'])
+		);
 	}
 	public function edit($id)
 	{
@@ -245,6 +344,7 @@ class Penilaian extends User_Controller
 					</button>
 					<ul class="dropdown-menu">
 						<li>' . anchor("juri/penilaian/hasil/" . base64_encode($tps->t_no_gugus), "<i class=\"fa fa-print\"></i>Hasil Topsis") . '</li>
+						<li>' . anchor("penilaian/send_nilai/" . base64_encode($tps->t_no_gugus), "<i class=\"fa fa-envelope\"></i>Kirim Email") . '</li>
 					</ul>
                 </div>';
                

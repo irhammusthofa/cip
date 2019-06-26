@@ -42,6 +42,4 @@ function loadtable() {
 
     });
 }
-
-
 </script>

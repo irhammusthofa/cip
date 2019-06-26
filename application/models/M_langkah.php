@@ -18,6 +18,7 @@ class M_langkah extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('bab_risalah br','br.br_kode=rk.id_bab','inner');
+        $this->db->where('br.id_tahun',$this->thn_aktif);
     
         $i = 0;
         foreach ($this->column_search as $item) // loop column
@@ -71,11 +72,13 @@ class M_langkah extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->join('bab_risalah br','br.br_kode=rk.id_bab','inner');
+        $this->db->where('br.id_tahun',$this->thn_aktif);
         return $this->db->count_all_results();
     }
     public function all(){
         return $this->db->from('langkah l')
             ->join('bab_risalah br','br.br_kode=l.id_bab','inner')
+            ->where('br.id_tahun',$this->thn_aktif)
             ->get();
     }
     public function by_bab($id){

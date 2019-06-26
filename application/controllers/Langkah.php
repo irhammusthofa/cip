@@ -62,6 +62,7 @@ class Langkah extends User_Controller
         $data['ln_id'] 	    = $this->input->post('kode',TRUE);
         $data['ln_langkah'] = $this->input->post('langkah',TRUE);
         $data['id_bab']     = $this->input->post('kode_bab',TRUE);
+        $data['ln_ver_pimpinan']     = $this->input->post('ver_pimpinan',TRUE);
 
         $q = $this->m_langkah->insert($data);
         if ($q){
@@ -77,6 +78,7 @@ class Langkah extends User_Controller
         $data['ln_id'] 	    = $this->input->post('kode',TRUE);
         $data['ln_langkah'] = $this->input->post('langkah',TRUE);
         $data['id_bab']     = $this->input->post('kode_bab',TRUE);
+        $data['ln_ver_pimpinan']     = $this->input->post('ver_pimpinan',TRUE);
 
         $q = $this->m_langkah->update($id,$data);
         if ($q){
@@ -114,6 +116,7 @@ class Langkah extends User_Controller
 			$row[] = $item->ln_id;
 			$row[] = $item->ln_langkah;
 			$row[] = $item->br_bab;
+			$row[] = ($item->ln_ver_pimpinan==0) ? label_skin(['type'=>'default','text'=>'Tidak']) : label_skin(['type'=>'success','text'=>'Ya']);
 			$data[] = $row;
 		}
 
